@@ -1,0 +1,22 @@
+{
+  "name": "infostein-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Kotokrad",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "body-parser": "^1.17.1",
+    "cheerio": "^0.22.0",
+    "docxtemplater": "^3.0.5",
+    "express": "^4.15.2",
+    "jszip": "^2.6.1",
+    "memory-cache": "^0.1.6",
+    "moment": "^2.17.1"
+  }
+}
