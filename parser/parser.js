@@ -59,18 +59,12 @@ function loadSource(data, config) {
 }
 
 function parseItem(source, config) {
-  var item = {
-    channel: config.channel,
-    program: config.program,
-    hasRepeat: !!config.repeat,
-    repeat: config.repeat,
-  };
   moment.locale('ru');
-  item.date = moment(source.date, config['match:date']).format('DD.MM.YYYY');
-  item.time = config.time;
+  var date = moment(source.date, config['match:date']).format('DD.MM.YYYY');
+  var time = config.time;
   var titleMatchResult = source.title.match(new RegExp(config['match:title'], ''))
-  item.title = normalize(titleMatchResult ? titleMatchResult[1] : source.title);
-  item.body = source.body
+  var title = normalize(titleMatchResult ? titleMatchResult[1] : source.title);
+  var body = source.body
     .replace(/\r?\n|\r/g, '\n')
     .replace(/\n+/g, '#NEWLINE#')
     .replace(/[\s\h]{2,}/g, ' ')
@@ -80,7 +74,21 @@ function parseItem(source, config) {
     .map(p => {
       return { paragraph: typify(p) };
     });
-  return item;
+  if (title && date && body.length) {
+    return {
+      status: 'OK',
+      channel: config.channel,
+      program: config.program,
+      hasRepeat: !!config.repeat,
+      repeat: config.repeat,
+      title,
+      date,
+      time,
+      body,
+    };
+  } else {
+    throw new Error('Parsing error');
+  }
 }
 
 function getItem(link) {
@@ -97,7 +105,10 @@ function getItem(link) {
         cache.put(link, item, 30000, key => console.log(`deleted: ${key}`));
         resolve(item)
       }).catch(err => {
-        console.log(err);
+        resolve({
+          status: 'ERROR',
+          link: link,
+        });
       });
     }
   });
