@@ -5,7 +5,7 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 const cache = require('memory-cache');
 
-const configs = require('./configs.json');
+const config = require('../config.json');
 
 function typify(textSource) {
   var paragraph;
@@ -46,11 +46,11 @@ function normalize(textSource) {
   return text;
 };
 
-function loadSource(data, config) {
+function loadSource(data, channelConfig) {
   var $ = cheerio.load(data);
-  var title = $(config['sel:title']).text();
-  var body = $(config['sel:body']).text();
-  var date = $(config['sel:date']).text();
+  var title = $(channelConfig['sel:title']).text();
+  var body = $(channelConfig['sel:body']).text();
+  var date = $(channelConfig['sel:date']).text();
   return {
     title,
     body,
@@ -58,11 +58,11 @@ function loadSource(data, config) {
   };
 }
 
-function parseItem(source, config) {
+function parseItem(source, channelConfig) {
   moment.locale('ru');
-  var date = moment(source.date, config['match:date']).format('DD.MM.YYYY');
-  var time = config.time;
-  var titleMatchResult = source.title.match(new RegExp(config['match:title'], ''))
+  var date = moment(source.date, channelConfig['match:date']).format('DD.MM.YYYY');
+  var time = channelConfig.time;
+  var titleMatchResult = source.title.match(new RegExp(channelConfig['match:title'], ''))
   var title = normalize(titleMatchResult ? titleMatchResult[1] : source.title);
   var body = source.body
     .replace(/\r?\n|\r/g, '\n')
@@ -77,10 +77,10 @@ function parseItem(source, config) {
   if (title && date && body.length) {
     return {
       status: 'OK',
-      channel: config.channel,
-      program: config.program,
-      hasRepeat: !!config.repeat,
-      repeat: config.repeat,
+      channel: channelConfig.channel,
+      program: channelConfig.program,
+      hasRepeat: !!channelConfig.repeat,
+      repeat: channelConfig.repeat,
       title,
       date,
       time,
@@ -99,10 +99,10 @@ function getItem(link) {
     } else {
       axios.get(link).then(({ data }) => {
         var host = url.parse(link).host;
-        var config = configs[host];
-        var source = loadSource(data, config);
-        var item = parseItem(source, config);
-        cache.put(link, item, 30000, key => console.log(`deleted: ${key}`));
+        var channelConfig = config.channels[host];
+        var source = loadSource(data, channelConfig);
+        var item = parseItem(source, channelConfig);
+        cache.put(link, item, config.cacheTimeout, key => console.log(`deleted: ${key}`));
         resolve(item)
       }).catch(err => {
         resolve({

@@ -1,0 +1,18 @@
+{
+  "cacheTimeout": 30000,
+  "channels": {
+    "sigmatv.com.ua": {
+      "channel": "Сигма",
+      "program": "Зеркало",
+      "time": "18:45",
+      "repeat": "20:30, 23:00 08.03.2017; 06:30, 07:45 09.03.2017",
+      "link:list": "http://sigmatv.com.ua/news/",
+      "sel:link": ".main_block > h3 > a",
+      "sel:date": ".main_block > .date_news",
+      "sel:body": "body > section > div > p, body > section > div > blockquote",
+      "sel:title": ".main_block > h3",
+      "match:date": "dddd, DD MMMM, YYYY",
+      "match:title": "[|] (.+)"
+    }
+  }
+}
