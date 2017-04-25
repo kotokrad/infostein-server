@@ -13,6 +13,17 @@
       "sel:title": ".main_block > h3",
       "match:date": "dddd, DD MMMM, YYYY",
       "match:title": "[|] (.+)"
+    },
+    "www.mariupolskoe.tv": {
+      "channel": "МТВ",
+      "program": "МСН",
+      "time": "20:00",
+      "link:list": "http://www.mariupolskoe.tv/category/news/news-story/",
+      "sel:link": ".oi_post_holder .oi_blog_post_title a",
+      "sel:date": ".oi_single_post_meta",
+      "sel:body": ".oi_single_post_conent > p",
+      "sel:title": ".oi_single_post_title > h1",
+      "match:date": "DD MMMMYYYY"
     }
   }
 }

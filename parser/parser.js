@@ -15,6 +15,8 @@ function typify(textSource) {
     var firstName = fullName[0][0].toUpperCase() + fullName[0].slice(1).toLowerCase();
     var lastName = fullName[1] ? ' ' + fullName[1].toUpperCase() : '';
     var whois = match[2].trim();
+    if (whois == whois.toUpperCase())
+      whois = whois.toLowerCase();
     var text = match[3];
     paragraph = `СИНХРОН: ${firstName}${lastName}, ${whois}: «${text}».`;
   } else if (match = /^ ?[-–] (.+)$/.exec(textSource)) {
@@ -49,8 +51,10 @@ function normalize(textSource) {
 function loadSource(data, channelConfig) {
   var $ = cheerio.load(data);
   var title = $(channelConfig['sel:title']).text();
-  var body = $(channelConfig['sel:body']).text();
   var date = $(channelConfig['sel:date']).text();
+  var body = $(channelConfig['sel:body']).map((i, el) => {
+   return $(el).text();
+ }).get().join('\n');
   return {
     title,
     body,
@@ -60,10 +64,10 @@ function loadSource(data, channelConfig) {
 
 function parseItem(source, channelConfig) {
   moment.locale('ru');
-  var date = moment(source.date, channelConfig['match:date']).format('DD.MM.YYYY');
+  var date = moment(source.date.trim(), channelConfig['match:date']).format('DD.MM.YYYY');
   var time = channelConfig.time;
   var titleMatchResult = source.title.match(new RegExp(channelConfig['match:title'], ''))
-  var title = normalize(titleMatchResult ? titleMatchResult[1] : source.title);
+  var title = normalize(titleMatchResult[1] ? titleMatchResult[1] : source.title);
   var body = source.body
     .replace(/\r?\n|\r/g, '\n')
     .replace(/\n+/g, '#NEWLINE#')
